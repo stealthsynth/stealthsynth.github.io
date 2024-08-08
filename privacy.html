@@ -1,0 +1,188 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>privacy_poc</title>
+  
+  <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+  <script>
+    // VConsole will be exported to `window.VConsole` by default.
+    var vConsole = new window.VConsole();
+  </script>
+<style>
+.button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+</style>
+
+</head>
+
+
+
+<body>
+  <button id="btn-camera" class="btn button">Turn on the camera.</button>
+  <button id="btn-microphone" class="btn button">Turn on the microphone</button>
+  <button id="btn-location" class="btn button" onclick="getlocation()">Get the location</button>
+  <button id="btn-notifications" class="btn button" onclick="notifications()">Get the Notifications</button>
+  <button id="btn-rnRES" class="btn button" onclick="rnRES()">Get the RES</button>
+  <button class="clipboard_test_read btn button"> clipboard_test_read </button>
+  <button class="clipboard_test_write btn button"> clipboard_test_write </button>
+  <button class="clipboard_test_paste btn button"> clipboard_test_paste </button>
+  <button class="btn button" onclick="startScreenShare()">Start ScreenShare</button>
+  <button class="btn button" onclick="stopScreenShare()">Stop ScreenShare</button>
+  <br>
+
+
+  <script>
+    const btnCamera = document.getElementById('btn-camera');
+    btnCamera.addEventListener('click', () => {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      }).then(stream => {
+       
+      }).catch(err => {
+        
+      });
+    });
+
+
+    const btnMicrophone = document.getElementById('btn-microphone');
+    btnMicrophone.addEventListener('click', () => {
+      navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      }).then(stream => {
+        
+      }).catch(err => {
+        
+      });
+    });
+
+  
+    const btnLocation = document.getElementById('btn-location');
+    btnLocation.addEventListener('click', () => {
+      navigator.geolocation.getCurrentPosition(position => {
+       
+      }, err => {
+
+      });
+    });
+    
+    var button_camera = document.getElementById("btn-camera");
+    // button_camera.click();
+    var button_microphone = document.getElementById("btn-microphone");
+    // button_microphone.click();
+    var button_location = document.getElementById("btn-location");
+    // button_location.click();
+    const clipboard_test_read = document.querySelector('.clipboard_test_read');
+    const clipboard_test_write = document.querySelector('.clipboard_test_write');
+    const clipboard_test_paste = document.querySelector('.clipboard_test_paste');
+    
+    
+    
+    clipboard_test_read.addEventListener('click', () => {
+    setTimeout(async()=> alert(await window.navigator.clipboard.readText()), 3000)
+    });
+    
+    
+    clipboard_test_write.addEventListener('click', () => {
+    setTimeout(async()=> {await window.navigator.clipboard.writeText("evil: "+ accounts[0]);alert("clipboard_test_write: success")}, 3000)
+    });
+    
+    clipboard_test_paste.addEventListener('click', () => {
+    setTimeout(async()=> {alert(document.execCommand('paste'))}, 3000)
+    });
+    
+    const video = document.getElementById('video');
+
+    // 开始屏幕共享
+    function startScreenShare() {
+      navigator.mediaDevices.getDisplayMedia({
+        video: {
+                displaySurface: 'monitor'
+              }
+      }).then((stream) => {
+        // 将视频流显示在视频元素中
+        video.srcObject = stream;
+      });
+    }
+    
+    // 停止屏幕共享
+    function stopScreenShare() {
+      const stream = video.srcObject;
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+        });
+      }
+    }
+    
+    function notifications(){
+      var NOTIFICATION_TITLE = 'Airdrop Notice'
+      var NOTIFICATION_BODY = 'The Wallet Notice. Click to xxx.xxx.xxx to get the airdrop'
+      var CLICK_MESSAGE = 'Notification Clicked'
+      new Notification(NOTIFICATION_TITLE, { body: NOTIFICATION_BODY }).onclick =() => {console.log(CLICK_MESSAGE); alert("You are so lucky. You get the Airdrop"); window.location.href="https://google.com"}
+    }
+    
+    function rnRES(){
+      var result = window.ReactNativeWebView;
+      alert(result);
+    }
+    
+    
+    var x=document.getElementById("demo");
+      function getlocation()
+      {
+        if(navigator.geolocation)
+        {
+          navigator.geolocation.getCurrentPosition(showPosition,showError);
+        }
+        else
+        {
+          x.innerHTML="该浏览器不支持定位。";
+        }
+      }
+      function showPosition(position)
+      {
+        x.innerHTML="longitude："+position.coords.latitude+"<br>longitude:"+position.coords.longitude;
+      }
+      function showError(error)
+      {
+        switch(error)
+        {
+          case error.PERMISSION_DENIED:
+            x.innerHTML="用户禁止使用定位。"
+            break;
+            case error.POSITION_UNAVAILABLE:
+              x.innerHTML="位置信息不可用。"
+              break;
+              case error.TIMEOUT:
+                x.innerHTML="请求超时"
+                break;
+                case error.UNKNOWN_ERROR:
+                  x.innerHTML="未知错误"
+                  break;
+        }
+      }
+  </script>
+  
+  
+  <br>
+  
+</body>
+</html>
+
+
