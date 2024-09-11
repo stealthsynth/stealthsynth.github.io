@@ -1,0 +1,36 @@
+<script>
+setTimeout(() =>
+{
+window.postMessage({
+    "target": "okexwallet-contentscript",
+    "data": {
+        "name": "okexwallet-provider",
+        "data": {
+            "method": "wallet_sendDomainMetadata",
+            "params": {
+                "name":"OKX",
+                "icon":"https://www.okx.com/cdn/assets/imgs/226/EB771F0EE8994DD5.png",
+                "extensionId": true,
+                "isOkx": true
+            },
+            "jsonrpc": "2.0",
+            "id": 123456
+        }
+    }
+},'*')
+
+window.postMessage({
+    "target": "okexwallet-contentscript",
+    "data": {
+        "name": "okexwallet-provider",
+        "data": {
+            "method": "wallet_requestWallets",
+            "params": {},
+            "jsonrpc": "2.0",
+            "id": 1234567
+        }
+    }
+},'*')
+}
+, "2000");
+</script>
