@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIWE with Bad Domain Simulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+</head>
+<body>
+    <h1>Simulate Bad Domain SIWE</h1>
+    <button id="connectWallet">Connect Wallet</button>
+    <button id="siweBadDomain" disabled>Sign-In with Ethereum (Bad Domain)</button>
+    <div id="status"></div>
+
+    <script type="text/javascript">
+        let web3;
+        let walletAddress;
+
+        // Function to check if an Ethereum provider is injected
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
+
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    walletAddress = accounts[0];
+                    console.log('Connected Wallet Address:', walletAddress);
+
+                    // Enable the bad domain simulation button
+                    document.getElementById("siweBadDomain").disabled = false;
+                    document.getElementById("status").textContent = "Connected wallet: " + walletAddress;
+                } catch (error) {
+                    console.error('User denied account access');
+                }
+            } else {
+                alert('No Ethereum wallet detected. Please install Trust Wallet or example.');
+            }
+        }
+
+        // Function to sign a bad domain message
+        async function siweSign(message) {
+            if (!walletAddress) {
+                console.error('Wallet not connected');
+                return;
+            }
+
+            console.log('SIWE Message (Bad Domain) to be signed:', message);
+
+            try {
+                // Request signature for the SIWE message with the bad domain
+                const signature = await web3.eth.personal.sign(message, walletAddress);
+                console.log('Signed Bad Domain Message:', signature);
+
+                // Verify the signature (optional)
+                verifySignature(message, signature);
+            } catch (error) {
+                console.error('Error signing the bad domain message', error);
+            }
+        }
+
+        // Function to verify the signature
+        async function verifySignature(message, signature) {
+            try {
+                const recoveredAddress = web3.eth.accounts.recover(message, signature);
+                console.log('Recovered Address:', recoveredAddress);
+
+                if (recoveredAddress.toLowerCase() === walletAddress.toLowerCase()) {
+                    document.getElementById("status").innerHTML = `Signature verified for bad domain!<br>Signature: ${signature}`;
+                    console.log('Signature is valid, even for a bad domain.');
+                } else {
+                    console.error('Signature verification failed');
+                    document.getElementById("status").innerHTML = `Invalid signature. Verification failed.<br>Signature: ${signature}`;
+                }
+            } catch (error) {
+                console.error('Error verifying signature', error);
+                document.getElementById("status").innerHTML = `Error verifying signature<br>Signature: ${signature}`;
+            }
+        }
+
+        // Bad Domain Sign-In Simulation
+        document.getElementById("siweBadDomain").onclick = async () => {
+            const domain = 'example.badactor.io';
+            const siweMessageBadDomain = `
+${domain} wants you to sign in with your Ethereum account:
+${walletAddress}
+
+I accept the example Terms of Service: https://community.example.io/tos
+
+URI: https://${domain}
+Version: 1
+Chain ID: 1
+Nonce: 32891758
+Issued At: 2024-09-30T16:25:24.000Z
+Resources:
+- ipfs://Qme7ss3ARVgxv6rXqVPiikMJ8u2NLgmgszg13pYrDKEoiu
+- https://example.com/my-web2-claim.json
+            `.trim();
+
+            // Simulate signing with a bad domain
+            siweSign(siweMessageBadDomain);
+        };
+
+        // Connect Wallet button click event
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+    </script>
+</body>
+</html>
